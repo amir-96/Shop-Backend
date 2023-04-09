@@ -1,0 +1,19 @@
+[
+  {
+    "title": "test",
+    "image": "test",
+    "description": "test",
+    "price": 20,
+    "slug": "test",
+    "count": 2,
+    "offered": true
+  },
+  {
+    "title": "test",
+    "image": "test",
+    "description": "test",
+    "price": 20,
+    "slug": "test2",
+    "count": 2
+  }
+]
