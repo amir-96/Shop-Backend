@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
-import { NotFoundError } from 'rxjs';
 import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('/api/products')
@@ -40,16 +39,19 @@ export class ProductController {
   }
 
   @Put('/:slug')
-  async updateProduct(@Body() body: UpdateProductDto, @Param('slug') slug: string): Promise<boolean> {
+  async updateProduct(
+    @Body() body: UpdateProductDto,
+    @Param('slug') slug: string,
+  ): Promise<boolean> {
     const updatedProduct = await this.productService.updateProduct(body, slug);
 
-    return updatedProduct
+    return updatedProduct;
   }
 
   @Delete('/:slug')
   async deleteProduct(@Param('slug') slug: string): Promise<boolean> {
     const deletedProduct = await this.productService.deleteProduct(slug);
 
-    return deletedProduct
+    return deletedProduct;
   }
 }
