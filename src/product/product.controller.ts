@@ -1,18 +1,55 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  NotFoundException,
+} from '@nestjs/common';
 import { ProductService } from './product.service';
+import { CreateProductDto } from './dto/create-product.dto';
+import { NotFoundError } from 'rxjs';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('/api/products')
 export class ProductController {
-  constructor(private productsService: ProductService) {}
+  constructor(private productService: ProductService) {}
 
   @Get()
-  find() {
-    return this.productsService.getAllProducts();
+  async getProducts() {
+    const allProducts = await this.productService.getAllProducts();
+    return allProducts;
+  }
+
+  @Get('/:slug')
+  async getProductBySlug(@Param('slug') slug: string) {
+    const product = await this.productService.getProductBySlug(slug);
+
+    if (!product) {
+      throw new NotFoundException('Product not found!');
+    }
+    return product;
   }
 
   @Post()
-  createProduct(@Body() product: CreateProductDto) {
-    console.log(product);
+  async createProduct(@Body() body: CreateProductDto) {
+    const product = await this.productService.createProduct(body);
+    return product;
+  }
+
+  @Put('/:slug')
+  async updateProduct(@Body() body: UpdateProductDto, @Param('slug') slug: string): Promise<boolean> {
+    const updatedProduct = await this.productService.updateProduct(body, slug);
+
+    return updatedProduct
+  }
+
+  @Delete('/:slug')
+  async deleteProduct(@Param('slug') slug: string): Promise<boolean> {
+    const deletedProduct = await this.productService.deleteProduct(slug);
+
+    return deletedProduct
   }
 }

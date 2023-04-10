@@ -6,7 +6,7 @@ import {
   Length,
 } from 'class-validator';
 
-export class CreateProductDto {
+export class UpdateProductDto {
   @IsString()
   @Length(2, 50)
   title: string;
@@ -16,9 +16,6 @@ export class CreateProductDto {
 
   @IsString()
   description: string;
-
-  @IsString()
-  slug: string;
 
   @IsInt()
   price: number;
