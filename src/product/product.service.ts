@@ -24,7 +24,7 @@ export class ProductService {
   }
 
   // Create product
-  async createProduct(product: CreateProductDto) {
+  async createProduct(product: CreateProductDto): Promise<Boolean> {
     const isProduct = await this.prismaService.product.findUnique({
       where: {
         slug: product.slug,
