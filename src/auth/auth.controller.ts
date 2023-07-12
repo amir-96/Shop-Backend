@@ -1,11 +1,11 @@
-import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
+import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { RegisterUserDto } from './dtos/register-user.dto';
 import { AuthService } from './auth.service';
-import { RegisterUserDto } from './dto/register-user.dto';
-import { LoginUserDto } from './dto/login-user.dto';
-import { LocalAuthGuard } from './local-auth.guard';
+import { LoginUserDto } from './dtos/login-user.dto';
+import { AuthGuardClass } from './guards/Auth.Guard';
 import { JwtService } from '@nestjs/jwt';
 
-@Controller('auth')
+@Controller('api/auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
@@ -13,25 +13,21 @@ export class AuthController {
   ) {}
 
   @Post('/register')
-  async registerUser(@Body() body: RegisterUserDto) {
-    const user = await this.authService.registerUser(body);
+  async register(@Body() registeringUser: RegisterUserDto) {
+    const user = await this.authService.registerUser(registeringUser);
+
     return user;
   }
 
   @Post('/login')
-  @UseGuards(LocalAuthGuard)
-  async loginUser(@Body() body: LoginUserDto, @Request() req) {
+  @UseGuards(AuthGuardClass)
+  async loginUser(@Request() req) {
     return {
       token: this.jwtService.sign({
-        id: req.user.id,
-        username: req.user.username,
-        email: req.user.email,
+        id: req.user.Id,
+        username: req.user.UserName,
+        role: req.user.Role,
       }),
     };
-  }
-
-  @Get('/profile')
-  profile() {
-
   }
 }

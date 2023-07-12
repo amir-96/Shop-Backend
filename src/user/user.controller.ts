@@ -1,76 +1,64 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
   Put,
-  Delete,
-  Body,
-  Param,
-  Query,
-  NotFoundException,
-  ParseIntPipe,
+  SetMetadata,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { FindUserDto } from './dtos/find-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
+import { JwtGuardClass } from 'src/auth/guards/jwt-auth.guard';
+import { Roles } from './decorators/role.decorator';
+import { RoleGuard } from './guards/role.guard';
 
-@Controller('/api/users')
+@Controller('api/user')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
-  async getUsers(
-    @Query() query: { username: string },
-  ): Promise<CreateUserDto | CreateUserDto[]> {
-    if (!query) {
-      const users = await this.userService.getUsers();
+  @UseGuards(JwtGuardClass, RoleGuard)
+  @Roles('ADMIN')
+  async getUsers(): Promise<FindUserDto[]> {
+    const users = await this.userService.getAllUsers();
 
-      return users;
-    } else {
-      const { username } = query;
-
-      const user = await this.userService.getUserByUserName(username);
-
-      if (!user) {
-        throw new NotFoundException('User not found!');
-      }
-
-      return user;
-    }
+    return users;
   }
 
   @Get('/:id')
-  async getProductBySlug(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<CreateUserDto> {
-    const user = await this.userService.getUserById(id);
+  async getUser(@Param('id', ParseIntPipe) id: number): Promise<FindUserDto> {
+    const user = await this.userService.getOneUser(id);
 
-    if (!user) {
-      throw new NotFoundException('User not found!');
-    }
     return user;
   }
 
   @Post()
-  async createUser(@Body() body: CreateUserDto) {
-    const user = await this.userService.createUser(body);
+  async addUser(@Body() newUser: CreateUserDto) {
+    const user = await this.userService.addUser(newUser);
+
     return user;
   }
 
-  @Put('/:username')
-  async updateProduct(
-    @Body() body: UpdateUserDto,
-    @Param('username') username: string,
-  ): Promise<boolean> {
-    const updatedUser = await this.userService.updateUser(body, username);
+  @Put('/:id')
+  async updateUser(
+    @Body() changedUser: UpdateUserDto,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<FindUserDto> {
+    const user = await this.userService.updateUser(id, changedUser);
 
-    return updatedUser;
+    return user;
   }
 
-  @Delete('/:username')
-  async deleteProduct(@Param('username') username: string): Promise<boolean> {
-    const deletedUser = await this.userService.deleteUser(username);
+  @Delete('/:id')
+  async deleteUser(@Param('id', ParseIntPipe) id: number) {
+    await this.userService.deleteUser(id);
 
-    return deletedUser;
+    return 'User deleted';
   }
 }

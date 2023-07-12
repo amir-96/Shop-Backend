@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,54 +10,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Product {
-  id          Int        @id @default(autoincrement())
-  title       String
-  image       String
-  description String
-  slug        String     @unique
-  price       Int
-  count       Int
-  offered     Boolean?   @default(false)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  Comment     Comment[]
-  Category    Category[] @relation("CategoryToProduct")
-}
-
-model User {
-  id        Int       @id @default(autoincrement())
-  username  String    @unique
-  password  String
-  email     String    @unique
-  role      Role      @default(USER)
-  createdAt DateTime  @default(now())
-  Comment   Comment[]
-}
-
-model Comment {
-  id        Int     @id @default(autoincrement())
-  title     String
-  text      String
-  isPublish Boolean @default(false)
-  userId    Int
-  productId Int
-  Product   Product @relation(fields: [productId], references: [id])
-  User      User    @relation(fields: [userId], references: [id])
-}
-
-model Category {
-  id      Int        @id @default(autoincrement())
-  name    Categories
-  Product Product[]  @relation("CategoryToProduct")
-}
-
 enum Role {
   ADMIN
   USER
 }
 
-enum Categories {
-  Laptop
-  Phone
+model User {
+  Id        Int      @id @default(autoincrement())
+  UserName  String   @unique
+  Password  String
+  Role      Role     @default(USER)
+  CreatedAt DateTime @default(now())
+  UpdatedAt DateTime @updatedAt
 }
