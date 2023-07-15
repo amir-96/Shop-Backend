@@ -20,6 +20,7 @@ model User {
   UserName  String   @unique
   Password  String
   Role      Role     @default(USER)
+  ImageName String?
   CreatedAt DateTime @default(now())
   UpdatedAt DateTime @updatedAt
 }
